@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import "./App.css";
 import Registration from "./pages/registration/Registration";
@@ -8,9 +8,35 @@ import { selectUser } from "./redux/features/userSlice";
 
 function App() {
   const user = useSelector(selectUser);
+  const [isOnline, setIsOnline] = useState(navigator.onLine);
+
+  useEffect(() => {
+    const handleOnline = () => {
+      setIsOnline(true);
+      alert("You are back online!");
+    };
+
+    const handleOffline = () => {
+      setIsOnline(false);
+      alert("You are now offline. Some features may not be available.");
+    };
+
+    window.addEventListener("online", handleOnline);
+    window.addEventListener("offline", handleOffline);
+
+    return () => {
+      window.removeEventListener("online", handleOnline);
+      window.removeEventListener("offline", handleOffline);
+    };
+  }, []);
 
   return (
     <div className="App">
+      {!isOnline && (
+        <div className="offline-notice">
+          You are offline. Some features may not be available.
+        </div>
+      )}
       <BrowserRouter>
         <Routes>
           {/* Public route for registration/login */}
